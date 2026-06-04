@@ -11,7 +11,8 @@
     "dev": "tsx src/cli.tsx",
     "build": "tsc",
     "start": "node dist/cli.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts"
   },
   "keywords": ["claude", "coding-agent", "tui", "ink", "claude-agent-sdk"],
   "author": "Joseph",

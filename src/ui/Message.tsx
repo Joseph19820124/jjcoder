@@ -8,6 +8,7 @@ export type Entry =
   | { id: number; role: "tool"; name: string; input: string }
   | { id: number; role: "tool-result"; text: string }
   | { id: number; role: "system"; text: string }
+  | { id: number; role: "command"; title: string; lines: string[] }
   | { id: number; role: "error"; text: string };
 
 function clip(s: string, n: number): string {
@@ -53,6 +54,24 @@ export function Message({ entry }: { entry: Entry }): React.ReactElement {
     case "system":
       return (
         <Text color={theme.textMuted}>· {entry.text}</Text>
+      );
+    case "command":
+      return (
+        <Box
+          flexDirection="column"
+          borderStyle="round"
+          borderColor={theme.command}
+          paddingX={1}
+        >
+          <Text color={theme.command} bold>
+            {entry.title}
+          </Text>
+          {entry.lines.map((line, i) => (
+            <Text key={i} color={theme.text}>
+              {line}
+            </Text>
+          ))}
+        </Box>
       );
     case "error":
       return (
