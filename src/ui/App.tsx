@@ -5,7 +5,9 @@ import { Message, type Entry } from "./Message.js";
 import { InputArea } from "./InputArea.js";
 import { Footer } from "./Footer.js";
 import { ActivityIndicator } from "./ActivityIndicator.js";
+import { CommandHints } from "./CommandHints.js";
 import { runTurn } from "../agent.js";
+import { isCommand, handleCommand } from "../commands.js";
 
 export function App({ cwd }: { cwd: string }): React.ReactElement {
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -13,6 +15,7 @@ export function App({ cwd }: { cwd: string }): React.ReactElement {
   const [busy, setBusy] = useState(false);
   const [activity, setActivity] = useState("thinking");
   const [model, setModel] = useState<string | undefined>();
+  const [tools, setTools] = useState<number | undefined>();
   const [turns, setTurns] = useState<number | undefined>();
   const [cost, setCost] = useState<number | undefined>();
   const { exit } = useApp();
@@ -34,10 +37,39 @@ export function App({ cwd }: { cwd: string }): React.ReactElement {
   async function submit(value: string) {
     const text = value.trim();
     if (!text || busy) return;
-    if (text === "/quit" || text === "/exit") {
-      exit();
+
+    // Slash commands are handled locally — never forwarded to the agent.
+    if (isCommand(text)) {
+      setInput("");
+      const out = handleCommand(text, {
+        cwd,
+        model,
+        turns,
+        costUsd: cost,
+        tools,
+        entryCount: entries.length,
+      });
+      if (out.action === "quit") {
+        exit();
+        return;
+      }
+      if (out.action === "clear") {
+        setEntries([]);
+        return;
+      }
+      if (out.action === "reset") {
+        setEntries([]);
+        setModel(undefined);
+        setTools(undefined);
+        setTurns(undefined);
+        setCost(undefined);
+        return;
+      }
+      push({ role: "user", text });
+      push({ role: "command", title: out.title, lines: out.lines });
       return;
     }
+
     setInput("");
     push({ role: "user", text });
     setBusy(true);
@@ -47,6 +79,7 @@ export function App({ cwd }: { cwd: string }): React.ReactElement {
       switch (ev.kind) {
         case "system":
           if (ev.model) setModel(ev.model);
+          if (ev.tools != null) setTools(ev.tools);
           push({ role: "system", text: `session · model=${ev.model} · tools=${ev.tools} · ${ev.cwd}` });
           break;
         case "assistant":
@@ -90,6 +123,7 @@ export function App({ cwd }: { cwd: string }): React.ReactElement {
           </Box>
         )}
         <InputArea value={input} onChange={setInput} onSubmit={submit} busy={busy} />
+        {!busy && <CommandHints input={input} />}
         <Footer model={model} turns={turns} costUsd={cost} />
       </Box>
     </Box>

@@ -34,6 +34,22 @@ npm run build && npm start
 
 Type a request at the prompt. `/quit` or `Ctrl+C` to exit.
 
+### Slash commands
+
+Slash commands are handled locally — they never get forwarded to the agent.
+Type `/` to see live suggestions.
+
+| Command | Does |
+| --- | --- |
+| `/help`, `/?` | list available commands |
+| `/status` | session info — model, tools, turns, cost |
+| `/model` | show the active model |
+| `/tools` | list the tools the agent can use |
+| `/cwd` | show the working directory |
+| `/clear` | clear the transcript |
+| `/reset` | clear the transcript and reset session stats |
+| `/quit`, `/exit` | exit jjcoder |
+
 ## What it does
 
 - Streams Claude's replies, tool calls (Read/Write/Edit/Bash/Glob/Grep), and

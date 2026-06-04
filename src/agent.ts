@@ -22,6 +22,9 @@ const SYSTEM_PROMPT = `You are jjcoder, a concise terminal coding assistant.
 Do the work directly with your tools (Read/Write/Edit/Bash/Glob/Grep). No
 preamble. When you run code, report the captured output. Keep replies tight.`;
 
+/** Tools the agent is permitted to use. Single source of truth for /tools too. */
+export const ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"] as const;
+
 function resolveClaudeCli(): string | undefined {
   const candidates = [
     process.env.JJCODER_CLAUDE_PATH,
@@ -56,7 +59,7 @@ export async function* runTurn(prompt: string, cwd: string): AsyncGenerator<Agen
 
   const options: Options = {
     systemPrompt: SYSTEM_PROMPT,
-    allowedTools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
+    allowedTools: [...ALLOWED_TOOLS],
     permissionMode: "bypassPermissions",
     cwd,
     maxTurns: 16,
