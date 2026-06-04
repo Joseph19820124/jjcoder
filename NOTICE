@@ -1,0 +1,17 @@
+jjcoder
+=======
+
+jjcoder is an independent terminal coding agent. Its user interface — the
+layout, the dark color palette, and the general look-and-feel — is modelled
+on ggcoder by KenKai, part of the gg-framework project:
+
+    gg-framework  (MIT License, Copyright (c) 2025 KenKai)
+    https://github.com/KenKaiii/gg-framework
+
+ggcoder is MIT-licensed. This project takes design inspiration from it and
+reimplements the interface from scratch; no source files from gg-framework
+are copied into jjcoder. We gratefully credit KenKai's work.
+
+What is different here: jjcoder's backend is a single path — the Claude Agent
+SDK driving the Claude Code CLI — authenticated with a Claude Pro/Max
+subscription, rather than ggcoder's own multi-provider agent.
