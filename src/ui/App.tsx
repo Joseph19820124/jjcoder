@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Static, useApp, useInput } from "ink";
 import { Banner } from "./Banner.js";
 import { Message, type Entry } from "./Message.js";
@@ -6,7 +6,7 @@ import { InputArea } from "./InputArea.js";
 import { Footer } from "./Footer.js";
 import { ActivityIndicator } from "./ActivityIndicator.js";
 import { CommandHints } from "./CommandHints.js";
-import { runTurn } from "../agent.js";
+import { resolveConfiguredModel, runTurn } from "../agent.js";
 import { isCommand, handleCommand } from "../commands.js";
 
 export function App({ cwd }: { cwd: string }): React.ReactElement {
@@ -19,6 +19,16 @@ export function App({ cwd }: { cwd: string }): React.ReactElement {
   const [turns, setTurns] = useState<number | undefined>();
   const [cost, setCost] = useState<number | undefined>();
   const { exit } = useApp();
+
+  useEffect(() => {
+    let cancelled = false;
+    void resolveConfiguredModel(cwd).then((configuredModel) => {
+      if (!cancelled && configuredModel) setModel(configuredModel);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [cwd]);
 
   const nextId = (() => {
     let n = 0;

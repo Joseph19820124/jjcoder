@@ -5,7 +5,7 @@
 // your Pro/Max plan (no per-token API billing). We never set an API key or an
 // endpoint — the CLI owns both.
 
-import { query, type Options } from "@anthropic-ai/claude-agent-sdk";
+import { query, resolveSettings, type Options } from "@anthropic-ai/claude-agent-sdk";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
@@ -24,6 +24,17 @@ preamble. When you run code, report the captured output. Keep replies tight.`;
 
 /** Tools the agent is permitted to use. Single source of truth for /tools too. */
 export const ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"] as const;
+
+/** Read the configured Claude Code model without starting an agent turn. */
+export async function resolveConfiguredModel(cwd: string): Promise<string | undefined> {
+  try {
+    const settings = await resolveSettings({ cwd });
+    const model = settings.effective.model;
+    return typeof model === "string" && model.trim() ? model : undefined;
+  } catch {
+    return undefined;
+  }
+}
 
 function resolveClaudeCli(): string | undefined {
   const candidates = [
