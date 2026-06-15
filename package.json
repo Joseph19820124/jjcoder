@@ -6,7 +6,12 @@
   "bin": {
     "jjcoder": "dist/cli.js"
   },
-  "files": ["dist", "LICENSE", "NOTICE", "README.md"],
+  "files": [
+    "dist",
+    "LICENSE",
+    "NOTICE",
+    "README.md"
+  ],
   "scripts": {
     "dev": "tsx src/cli.tsx",
     "build": "tsc",
@@ -14,13 +19,20 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test test/*.test.ts"
   },
-  "keywords": ["claude", "coding-agent", "tui", "ink", "claude-agent-sdk"],
+  "keywords": [
+    "claude",
+    "coding-agent",
+    "tui",
+    "ink",
+    "claude-agent-sdk"
+  ],
   "author": "Joseph",
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.3.163",
     "chalk": "^5.6.2",
     "ink": "^6.8.0",
+    "ink-select-input": "^6.2.0",
     "ink-text-input": "^6.0.0",
     "marked": "^15.0.12",
     "marked-terminal": "^7.3.0",

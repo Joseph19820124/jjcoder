@@ -35,7 +35,7 @@ export function Selector({
       <Box marginTop={1}>
         <SelectInput
           items={decorated}
-          onSelect={(item) => onSelect(item.value)}
+          onSelect={(item: { value: string }) => onSelect(item.value)}
           onHighlight={() => {}}
         />
       </Box>
