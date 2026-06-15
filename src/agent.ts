@@ -25,6 +25,13 @@ preamble. When you run code, report the captured output. Keep replies tight.`;
 /** Tools the agent is permitted to use. Single source of truth for /tools too. */
 export const ALLOWED_TOOLS = ["Read", "Write", "Edit", "Bash", "Glob", "Grep"] as const;
 
+export interface TurnOptions {
+  /** Claude model id, e.g. "claude-opus-4-8". Omit to use the CLI default. */
+  model?: string;
+  /** Called before each tool runs — used to snapshot files for /rewind. */
+  onBeforeTool?: (toolName: string, input: Record<string, unknown>) => void;
+}
+
 function resolveClaudeCli(): string | undefined {
   const candidates = [
     process.env.JJCODER_CLAUDE_PATH,
@@ -47,7 +54,11 @@ function blockText(content: unknown): string {
 }
 
 /** Run one user turn, yielding normalized events the UI can render. */
-export async function* runTurn(prompt: string, cwd: string): AsyncGenerator<AgentEvent> {
+export async function* runTurn(
+  prompt: string,
+  cwd: string,
+  turnOpts: TurnOptions = {},
+): AsyncGenerator<AgentEvent> {
   if (process.env.ANTHROPIC_API_KEY) {
     yield {
       kind: "error",
@@ -64,6 +75,28 @@ export async function* runTurn(prompt: string, cwd: string): AsyncGenerator<Agen
     cwd,
     maxTurns: 16,
     pathToClaudeCodeExecutable: resolveClaudeCli(),
+    ...(turnOpts.model ? { model: turnOpts.model } : {}),
+    // PreToolUse fires for every tool regardless of permission mode, so it is
+    // the reliable place to snapshot files before they are mutated (/rewind).
+    hooks: {
+      PreToolUse: [
+        {
+          hooks: [
+            async (input) => {
+              const i = input as { tool_name?: string; tool_input?: unknown };
+              try {
+                if (i.tool_name) {
+                  turnOpts.onBeforeTool?.(i.tool_name, (i.tool_input ?? {}) as Record<string, unknown>);
+                }
+              } catch {
+                // snapshotting must never block the tool
+              }
+              return { continue: true };
+            },
+          ],
+        },
+      ],
+    },
   };
 
   try {

@@ -71,9 +71,12 @@ test("/tools omits the session-total note when counts match", () => {
   assert.doesNotMatch(out.lines.join("\n"), /total/);
 });
 
-test("/model shows the active model or a hint", () => {
-  assert.deepEqual(handleCommand("/model", ctx).lines, ["claude-haiku-4-5-20251001"]);
-  assert.match(handleCommand("/model", { cwd: "/x", entryCount: 0 }).lines[0]!, /not resolved/);
+test("/model opens the model switcher overlay", () => {
+  assert.equal(handleCommand("/model", ctx).action, "model");
+});
+
+test("/rewind opens the checkpoint overlay", () => {
+  assert.equal(handleCommand("/rewind", ctx).action, "rewind");
 });
 
 test("/cwd returns the working directory", () => {

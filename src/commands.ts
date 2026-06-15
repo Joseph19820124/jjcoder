@@ -6,7 +6,7 @@
 
 import { ALLOWED_TOOLS } from "./agent.js";
 
-export type CommandAction = "clear" | "reset" | "quit" | null;
+export type CommandAction = "clear" | "reset" | "quit" | "model" | "rewind" | null;
 
 export interface CommandContext {
   cwd: string;
@@ -35,7 +35,8 @@ export interface CommandSpec {
 export const COMMANDS: CommandSpec[] = [
   { name: "/help", aliases: ["/?"], desc: "list available commands" },
   { name: "/status", desc: "session info — model, tools, turns, cost" },
-  { name: "/model", desc: "show the active model" },
+  { name: "/model", desc: "switch the Claude model for new turns" },
+  { name: "/rewind", desc: "restore files to an earlier checkpoint" },
   { name: "/tools", desc: "list the tools the agent can use" },
   { name: "/cwd", desc: "show the working directory" },
   { name: "/clear", desc: "clear the transcript" },
@@ -92,11 +93,12 @@ export function handleCommand(text: string, ctx: CommandContext): CommandOutput 
       };
 
     case "/model":
-      return {
-        title: "/model",
-        lines: [ctx.model ?? "not resolved yet — send a message first"],
-        action: null,
-      };
+      // Opens the model selector overlay (handled in the UI).
+      return { title: "/model", lines: [], action: "model" };
+
+    case "/rewind":
+      // Opens the checkpoint selector overlay (handled in the UI).
+      return { title: "/rewind", lines: [], action: "rewind" };
 
     case "/tools":
       return {

@@ -6,6 +6,8 @@ A terminal coding agent with a **ggcoder-style UI**, but a single, simple backen
  jjcoder UI (Ink/React)  ->  Claude Agent SDK  ->  Claude Code CLI
 ```
 
+![jjcoder](./screenshots/jjcoder.png)
+
 Auth is your **Claude Pro/Max subscription** — no API key, no per-token billing,
 no endpoint to configure. The Claude Code CLI handles auth (it reads
 `~/.claude/.credentials.json`) and the model connection; jjcoder just drives it.
@@ -43,7 +45,8 @@ Type `/` to see live suggestions.
 | --- | --- |
 | `/help`, `/?` | list available commands |
 | `/status` | session info — model, tools, turns, cost |
-| `/model` | show the active model |
+| `/model` | switch the Claude model for new turns (opus / sonnet / haiku) via a selector |
+| `/rewind` | restore files to an earlier checkpoint — snapshots are taken before the agent's first file edit each turn (via a `PreToolUse` hook); re-created files are removed on rollback |
 | `/tools` | list the tools the agent can use |
 | `/cwd` | show the working directory |
 | `/clear` | clear the transcript |
